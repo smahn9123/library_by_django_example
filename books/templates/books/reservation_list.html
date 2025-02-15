@@ -1,0 +1,54 @@
+<!-- books/templates/books/reservation_list.html -->
+{% extends 'base.html' %}
+ 
+{% block content %}
+<h3>예약 현황</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>도서명</th>
+            <th>예약자</th>
+            <th>예약일</th>
+            <th>만료일</th>
+            <th>상태</th>
+            <th>액션</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for reservation in reservations %}
+        <tr>
+            <td>{{ reservation.book.title }}</td>
+            <td>{{ reservation.user.username }}</td>
+            <td>{{ reservation.reserved_date|date:"Y-m-d" }}</td>
+            <td>{{ reservation.expiry_date|date:"Y-m-d" }}</td>
+            <td>
+                {% if reservation.status == 'WAITING' %}
+                    <span class="badge bg-warning">대기중</span>
+                {% elif reservation.status == 'AVAILABLE' %}
+                    <span class="badge bg-success">대출가능</span>
+                {% else %}
+                    <span class="badge bg-secondary">취소됨</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if reservation.status == 'WAITING' %}
+                    <form method="post" action="{% url 'books:reservation-cancel' reservation.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">취소</button>
+                    </form>
+                {% elif reservation.status == 'AVAILABLE' %}
+                    <form method="post" action="{% url 'books:loan-create' reservation.book.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-primary">대출</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">예약 내역이 없습니다.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

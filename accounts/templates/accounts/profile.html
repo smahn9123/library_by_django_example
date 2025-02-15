@@ -1,0 +1,92 @@
+<!-- accounts/templates/accounts/profile.html -->
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div class="card mb-4">
+   <div class="card-body">
+       <h3 class="card-title">내 정보</h3>
+       <p><strong>아이디:</strong> {{ user.username }}</p>
+       <p><strong>이메일:</strong> {{ user.email }}</p>
+       <p><strong>권한:</strong> {{ user.get_role_display }}</p>
+   </div>
+</div>
+ 
+<div class="card mb-4">
+   <div class="card-body">
+       <h4>현재 대출 현황</h4>
+       <table class="table">
+           <thead>
+               <tr>
+                   <th>도서명</th>
+                   <th>대출일</th>
+                   <th>반납예정일</th>
+                   <th>상태</th>
+               </tr>
+           </thead>
+           <tbody>
+               {% for loan in user.loan_set.all %}
+               <tr>
+                   <td>{{ loan.book.title }}</td>
+                   <td>{{ loan.loan_date|date:"Y-m-d" }}</td>
+                   <td>{{ loan.due_date|date:"Y-m-d" }}</td>
+                   <td>
+                       {% if loan.is_overdue %}
+                           <span class="badge bg-danger">연체</span>
+                       {% else %}
+                           <span class="badge bg-primary">대출중</span>
+                       {% endif %}
+                   </td>
+               </tr>
+               {% empty %}
+               <tr>
+                   <td colspan="4" class="text-center">대출 중인 도서가 없습니다.</td>
+               </tr>
+               {% endfor %}
+           </tbody>
+       </table>
+   </div>
+</div>
+ 
+<div class="card">
+   <div class="card-body">
+       <h4>예약 현황</h4>
+       <table class="table">
+           <thead>
+               <tr>
+                   <th>도서명</th>
+                   <th>예약일</th>
+                   <th>상태</th>
+                   <th>액션</th>
+               </tr>
+           </thead>
+           <tbody>
+               {% for reservation in user.reservation_set.all %}
+               <tr>
+                   <td>{{ reservation.book.title }}</td>
+                   <td>{{ reservation.reserved_date|date:"Y-m-d" }}</td>
+                   <td>
+                       {% if reservation.status == 'WAITING' %}
+                           <span class="badge bg-warning">대기중</span>
+                       {% elif reservation.status == 'AVAILABLE' %}
+                           <span class="badge bg-success">대출가능</span>
+                       {% endif %}
+                   </td>
+                   <td>
+                       {% if reservation.status == 'WAITING' %}
+                           <form method="post" action="{% url 'books:reservation-cancel' reservation.id %}" class="d-inline">
+                               {% csrf_token %}
+                               <button class="btn btn-sm btn-danger">취소</button>
+                           </form>
+                       {% endif %}
+                   </td>
+               </tr>
+               {% empty %}
+               <tr>
+                   <td colspan="4" class="text-center">예약 중인 도서가 없습니다.</td>
+               </tr>
+               {% endfor %}
+           </tbody>
+       </table>
+   </div>
+</div>
+{% endblock %}

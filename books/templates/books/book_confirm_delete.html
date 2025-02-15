@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h3 class="card-title">도서 삭제</h3>
+        <p>정말 "{{ book.title }}" 도서를 삭제하시겠습니까?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">삭제</button>
+            <a href="{% url 'books:book-detail' book.pk %}" class="btn btn-secondary">취소</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

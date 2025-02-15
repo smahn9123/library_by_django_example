@@ -1,0 +1,49 @@
+<!-- books/templates/books/loan_list.html -->
+{% extends 'base.html' %}
+ 
+{% block content %}
+<h3>대출 현황</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>도서명</th>
+            <th>대출자</th>
+            <th>대출일</th>
+            <th>반납예정일</th>
+            <th>상태</th>
+            <th>액션</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for loan in loans %}
+        <tr>
+            <td>{{ loan.book.title }}</td>
+            <td>{{ loan.user.username }}</td>
+            <td>{{ loan.loan_date|date:"Y-m-d" }}</td>
+            <td>{{ loan.due_date|date:"Y-m-d" }}</td>
+            <td>
+                {% if loan.status == 'RETURNED' %}
+                    <span class="badge bg-success">반납완료</span>
+                {% elif loan.is_overdue %}
+                    <span class="badge bg-danger">연체</span>
+                {% else %}
+                    <span class="badge bg-primary">대출중</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.role == 'LIBRARIAN' or user == loan.user %}
+                    <form method="post" action="{% url 'books:loan-return' loan.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">반납</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">대출 내역이 없습니다.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

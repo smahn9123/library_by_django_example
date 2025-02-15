@@ -1,0 +1,35 @@
+<!-- books/templates/books/book_form.html -->
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h3>{% if book %}도서 수정{% else %}도서 등록{% endif %}</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="title" class="form-label">도서명</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ book.title|default:'' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="author" class="form-label">저자</label>
+                <input type="text" class="form-control" id="author" name="author" value="{{ book.author|default:'' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="isbn" class="form-label">ISBN</label>
+                <input type="text" class="form-control" id="isbn" name="isbn" value="{{ book.isbn|default:'' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="publisher" class="form-label">출판사</label>
+                <input type="text" class="form-control" id="publisher" name="publisher" value="{{ book.publisher|default:'' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="total_quantity" class="form-label">총 수량</label>
+                <input type="number" class="form-control" id="total_quantity" name="total_quantity" value="{{ book.total_quantity|default:'1' }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">저장</button>
+            <a href="{% url 'books:book-list' %}" class="btn btn-secondary">취소</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

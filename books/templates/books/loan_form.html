@@ -1,0 +1,40 @@
+<!-- books/templates/books/loan_form.html -->
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">도서 대출</h3>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ book.title }}</h5>
+          <p class="card-text">
+            <strong>저자:</strong> {{ book.author }}<br>
+            <strong>출판사:</strong> {{ book.publisher }}<br>
+            <strong>ISBN:</strong> {{ book.isbn }}<br>
+            <strong>잔여 수량:</strong> {{ book.available_quantity }}/{{ book.total_quantity }}
+          </p>
+ 
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+ 
+          <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">대출하기</button>
+            <a href="{% url 'books:book-detail' book.pk %}" class="btn btn-secondary">취소</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

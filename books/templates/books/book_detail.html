@@ -1,0 +1,21 @@
+<!-- books/templates/books/book_detail.html -->
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h3>{{ book.title }}</h3>
+        <p>저자: {{ book.author }}</p>
+        <p>ISBN: {{ book.isbn }}</p>
+        <p>출판사: {{ book.publisher }}</p>
+        <p>잔여 수량: {{ book.available_quantity }}/{{ book.total_quantity }}</p>
+        
+        {% if user.is_authenticated and book.available_quantity > 0 %}
+            <form method="post" action="{% url 'books:loan-create' book.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary">대출신청</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

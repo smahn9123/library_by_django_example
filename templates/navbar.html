@@ -1,0 +1,22 @@
+<!-- templates/navbar.html -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">도서관</a>
+        <div class="navbar-nav">
+            {% if user.is_authenticated %}
+                {% if user.role == 'LIBRARIAN' %}
+                    <a class="nav-link" href="{% url 'books:book-create' %}">도서등록</a>
+                    <a class="nav-link" href="{% url 'books:loan-list' %}">대출관리</a>
+                {% endif %}
+                <a class="nav-link" href="{% url 'accounts:profile' %}">내정보</a>
+                <form class="d-inline" method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-link nav-link">로그아웃</button>
+                </form>
+            {% else %}
+                <a class="nav-link" href="{% url 'accounts:login' %}">로그인</a>
+                <a class="nav-link" href="{% url 'accounts:register' %}">회원가입</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

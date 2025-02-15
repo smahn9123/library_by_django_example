@@ -1,0 +1,54 @@
+<!-- books/templates/books/book_list.html -->
+{% extends 'base.html' %}
+ 
+{% block content %}
+<h3>도서 목록</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>도서명</th>
+            <th>저자</th>
+            <th>ISBN</th>
+            <th>출판사</th>
+            <th>잔여/전체</th>
+            <th>액션</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td><a href="{% url 'books:book-detail' book.pk %}">{{ book.title }}</a></td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.isbn }}</td>
+            <td>{{ book.publisher }}</td>
+            <td>{{ book.available_quantity }}/{{ book.total_quantity }}</td>
+            <td>
+                {% if user.is_authenticated %}
+                    {% if book.available_quantity > 0 %}
+                        <form method="post" action="{% url 'books:loan-create' book.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-primary">대출</button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{% url 'books:reservation-create' book.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-warning">예약</button>
+                        </form>
+                    {% endif %}
+                    
+                    {% if user.role == 'LIBRARIAN' %}
+                        <a href="{% url 'books:book-update' book.pk %}" class="btn btn-sm btn-secondary">수정</a>
+                        <a href="{% url 'books:book-delete' book.pk %}" class="btn btn-sm btn-danger">삭제</a>
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">도서가 없습니다.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
