@@ -30,3 +30,37 @@ jobs:
 
       - name: Docker 정리
         run: docker compose down
+
+  cd:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: SSH 키 설정
+        env:
+          PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$PRIVATE_KEY" > ~/.ssh/aws.pem
+          sed -i 's/\\n/\n/g' ~/.ssh/aws.pem  # 줄바꿈 문자 처리
+          chmod 600 ~/.ssh/aws.pem
+
+      - name: EC2에 배포
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/aws.pem -o StrictHostKeyChecking=no $USER@$HOST '
+            cd ~/app/library_by_django_example &&
+            git pull origin main &&
+            echo "DB_NAME=${{ secrets.DB_NAME }}" > .env &&
+            echo "DB_USER=${{ secrets.DB_USER }}" >> .env &&
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env &&
+            echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env &&
+            echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env &&
+            docker compose down &&
+            docker compose up -d --build
+          '
