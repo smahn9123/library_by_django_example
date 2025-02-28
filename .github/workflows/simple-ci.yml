@@ -1,13 +1,33 @@
-# .github/workflows/simple-ci.yml
+name: Python/Django CI
 
-name: 간단한 CI 예제 # 워크플로우의 이름
+on:
+  push:
+    branches: [main] # main 브랜치에 push할 때
+  pull_request:
+    branches: [main] # main 브랜치로 PR 생성할 때
 
-on: [push] # 이벤트 설정: push가 발생하면 실행
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
 
-jobs: # 실행할 작업들
-  hello-world: # 작업 이름
-    runs-on: ubuntu-latest # 실행 환경
+    steps:
+      # 1. 코드 가져오기
+      - name: 코드 체크아웃
+        uses: actions/checkout@v2
 
-    steps: # 실행할 단계들
-      - name: 인사하기
-        run: echo "안녕하세요! GitHub Actions입니다!"
+      # 2. Python 설정
+      - name: Python 설정하기
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+
+      # 3. 패키지 설치
+      - name: 패키지 설치하기
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. 테스트 실행
+      - name: Django 테스트 실행하기
+        run: |
+          python manage.py test
