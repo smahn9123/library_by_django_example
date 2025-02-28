@@ -1,0 +1,13 @@
+# .github/workflows/simple-ci.yml
+
+name: 간단한 CI 예제 # 워크플로우의 이름
+
+on: [push] # 이벤트 설정: push가 발생하면 실행
+
+jobs: # 실행할 작업들
+  hello-world: # 작업 이름
+    runs-on: ubuntu-latest # 실행 환경
+
+    steps: # 실행할 단계들
+      - name: 인사하기
+        run: echo "안녕하세요! GitHub Actions입니다!"
